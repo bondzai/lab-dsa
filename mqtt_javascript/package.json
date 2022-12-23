@@ -1,0 +1,16 @@
+{
+  "name": "mqtt_javascript",
+  "version": "1.0.0",
+  "description": "",
+  "main": "simple.js",
+  "scripts": {
+    "start": "node simple.js",
+    "dev": "node --watch simple.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "mqtt": "^4.3.7"
+  }
+}

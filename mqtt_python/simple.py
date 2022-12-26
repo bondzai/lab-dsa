@@ -22,5 +22,3 @@ def on_message(client, userdata, message):
     print("Received message '" + str(message.payload) + "' on topic '" + message.topic + "'")
 
 client.on_message = on_message
-
-client.subscribe("test")

@@ -2,7 +2,7 @@ import BAC0
 import json
 import time
 # create a bacnet connection to connect to the devices, use your local machine IP address and the subnet below and also specify the port number if needed
-bacnet = BAC0.lite(ip="192.168.11.161/24" ,port=47809)  
+bacnet = BAC0.lite(ip="192.168.11.161/24" ,port=47810)  
 data = {}
 
 

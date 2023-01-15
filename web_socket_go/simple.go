@@ -12,7 +12,9 @@ var upgrader = websocket.Upgrader{
     WriteBufferSize: 1024,
 }
 
+
 func main() {
+    upgrader.CheckOrigin = func(r *http.Request) bool { return true } // fix cors origin
     http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
         conn, err := upgrader.Upgrade(w, r, nil)
         if err != nil {

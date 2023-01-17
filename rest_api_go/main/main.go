@@ -52,7 +52,7 @@ func main() {
     })
 
     // Start the server
-    app.Listen(3000)
+    app.Listen(4000)
 }
 
 type User struct {

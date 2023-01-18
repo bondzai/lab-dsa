@@ -4,10 +4,15 @@ import (
   	"fmt"
 
 	"github.com/gofiber/fiber"
+	"github.com/influxdata/influxdb-client-go/v2"
 )
 
 func main() {
 	app := fiber.New()
+	client := influxdb2.NewClient("http://localhost:8086", "7mCH-C7vjw7ViMTI0hkDIfLm4fse5GA-2kX5BbGP-flkVtc-9sM6QKWQF9l7j7KnAMtSYtTZLlOmyZdOMWBqLQ==")
+	fmt.Println(client)
+	writeAPI := client.WriteAPIBlocking("jb", "demo")
+	fmt.Println(writeAPI)
 
     app.Get("/", func(c *fiber.Ctx) {
         c.Send("Hello, World!")
@@ -19,9 +24,7 @@ func main() {
             c.Status(503).Send(err)
             return
         }
-		fmt.Printf("data is of type %T\n", data)
         fmt.Println(data)
-        fmt.Println(data[])
         c.JSON(data)
     })
 
@@ -68,4 +71,3 @@ type ObjectJSON struct {
 	Install *int `json:"install"`
 	Battery *float64 `json:"battery"`
 }
-

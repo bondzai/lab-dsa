@@ -1,18 +1,18 @@
 package main
 
 import (
+    "fmt"
+
     "github.com/gofiber/fiber"
 )
 
 func main() {
     app := fiber.New()
 
-    // Define GET route
     app.Get("/", func(c *fiber.Ctx) {
         c.Send("Hello, World!")
     })
 
-    // Define GET route with parameter
     app.Get("/users/:id", func(c *fiber.Ctx) {
         id := c.Params("id")
         c.JSON(fiber.Map{
@@ -21,17 +21,16 @@ func main() {
         })
     })
 
-    // Define POST route
     app.Post("/users", func(c *fiber.Ctx) {
         user := new(User)
         if err := c.BodyParser(user); err != nil {
             c.Status(503).Send(err)
             return
         }
+        fmt.Println(user)
         c.JSON(user)
     })
 
-    // Define PUT route
     app.Put("/users/:id", func(c *fiber.Ctx) {
         id := c.Params("id")
         user := new(User)
@@ -45,13 +44,11 @@ func main() {
         })
     })
 
-    // Define DELETE route
     app.Delete("/users/:id", func(c *fiber.Ctx) {
         id := c.Params("id")
         c.Send("User " + id + " has been deleted.")
     })
 
-    // Start the server
     app.Listen(4000)
 }
 

@@ -27,7 +27,7 @@ func main() {
 	// convert data to json
 	jsonData, err := json.Marshal(data)
 	if err != nil {
-		fmt.Println("marshal error:", err)
+		fmt.Println("marshal error: ", err)
 		return
 	}
 

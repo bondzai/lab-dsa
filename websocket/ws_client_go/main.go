@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"net/url"
 
-	websocket "github.com/gorilla/websocket"
+	"github.com/gorilla/websocket"
 )
 
 type Data struct {
@@ -30,9 +30,9 @@ func main() {
 		fmt.Println("marshal error: ", err)
 		return
 	}
-
+	fmt.Println(jsonData)
 	// send json data
-	err = c.WriteMessage(websocket.TextMessage, jsonData)
+	err = c.WriteMessage(websocket.TextMessage, "jsonData")
 	if err != nil {
 		fmt.Println("write error:", err)
 		return

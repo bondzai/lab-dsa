@@ -32,7 +32,7 @@ func main() {
 	}
 	fmt.Println(jsonData)
 	// send json data
-	err = c.WriteMessage(websocket.TextMessage, "jsonData")
+	err = c.WriteMessage(websocket.TextMessage, jsonData)
 	if err != nil {
 		fmt.Println("write error:", err)
 		return

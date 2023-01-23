@@ -1,11 +1,13 @@
 package main
 
 import (
+	"context"
 	"fmt"
 	"time"
 
 	"github.com/gofiber/fiber"
 	influxdb2 "github.com/influxdata/influxdb-client-go/v2"
+	"github.com/jackc/pgx/v4"
 )
 
 type Data struct {
@@ -49,8 +51,43 @@ type DataInflux struct {
 	Battery       *float64  `json:"battery"`
 }
 
-func checkDeviceData() {
-	fmt.Println("test")
+var db *pgx.Conn
+
+func ConnectToDb() {
+	var err error
+	db, err = pgx.Connect(context.Background(), "postgres://jb:12345678@localhost:54320/aot")
+	if err != nil {
+		panic(err)
+	}
+}
+
+func GetDevices() {
+	ConnectToDb()
+	rows, err := db.Query(context.Background(), "SELECT * FROM apis_device	")
+	if err != nil {
+		panic(err)
+		return
+	}
+	defer rows.Close()
+
+	devices := make([]map[string]interface{}, 0)
+	for rows.Next() {
+		var id int
+		var title string
+		var description string
+		var location_id string
+
+		rows.Scan(&id, &title, &description, &location_id)
+		devices = append(devices, map[string]interface{}{
+			"id":          id,
+			"title":       title,
+			"description": description,
+			"location_id": location_id,
+		})
+	}
+
+	fmt.Println(devices)
+	defer db.Close(context.Background())
 }
 
 func writeToInflux(dataInflux *DataInflux) {
@@ -69,17 +106,14 @@ func writeToInflux(dataInflux *DataInflux) {
 		p.AddField("occupancy", *dataInflux.Occupancy)
 		fmt.Printf("value occ: %v\n", *dataInflux.Occupancy)
 	}
-
 	if dataInflux.Trigger_count != nil {
 		p.AddField("trigger_count", *dataInflux.Trigger_count)
 		fmt.Printf("value trig: %v\n", *dataInflux.Trigger_count)
 	}
-
 	if dataInflux.Install != nil {
 		p.AddField("install", *dataInflux.Install)
 		fmt.Printf("value install: %v\n", *dataInflux.Install)
 	}
-
 	if dataInflux.Battery != nil {
 		p.AddField("battery", *dataInflux.Battery)
 		fmt.Printf("value batt: %v\n", *dataInflux.Battery)
@@ -93,8 +127,8 @@ func main() {
 	app := fiber.New()
 
 	app.Get("/", func(c *fiber.Ctx) {
-		checkDeviceData()
-		c.Send("JB")
+		GetDevices()
+		c.Send("Hello from API")
 	})
 
 	app.Post("/api/v1/devices/input", func(c *fiber.Ctx) {
@@ -105,12 +139,8 @@ func main() {
 			return
 		}
 
-		fmt.Println(" ")
-		fmt.Println(" ******************* ")
-		fmt.Println("data: ", data)
-		fmt.Println(" ******************* ")
+		fmt.Println(data.DevEUI)
 
-		// ========== data: common ==========
 		dataInflux := new(DataInflux)
 		fmt.Println("*********************************************************************")
 		fmt.Printf("address dataInflux: %p\n", &dataInflux)
@@ -118,7 +148,7 @@ func main() {
 		fmt.Printf("address dataInflux: %v\n", *dataInflux)
 		fmt.Println("*********************************************************************")
 
-		dataInflux.Measurement = "PIR"
+		dataInflux.Measurement = "PIR" // check type after get data from postgres
 		dataInflux.Timestamp = time.Now()
 		dataInflux.Air_port = "pending"
 		dataInflux.Location = "pending"
@@ -126,16 +156,19 @@ func main() {
 		dataInflux.Device = data.DeviceName
 		dataInflux.Rssi = data.RxInfo[0].Rssi
 
-		// ========== data: PIR / magnetic
-		dataInflux.Occupancy = data.Object.Occupancy
-		dataInflux.Trigger_count = data.Object.Trigger_count
-		dataInflux.Install = data.Object.Install
-		dataInflux.Battery = data.Object.Battery
-
-		fmt.Println(dataInflux.Occupancy)
-		fmt.Println(dataInflux.Trigger_count)
-		fmt.Println(dataInflux.Install)
-		fmt.Println(dataInflux.Battery)
+		if data.Object != nil {
+			dataInflux.Occupancy = data.Object.Occupancy
+			dataInflux.Trigger_count = data.Object.Trigger_count
+			dataInflux.Install = data.Object.Install
+			dataInflux.Battery = data.Object.Battery
+			writeToInflux(dataInflux)
+		} else if data.ObjectJSON != nil {
+			dataInflux.Occupancy = data.ObjectJSON.Occupancy
+			dataInflux.Trigger_count = data.ObjectJSON.Trigger_count
+			dataInflux.Install = data.ObjectJSON.Install
+			dataInflux.Battery = data.ObjectJSON.Battery
+			writeToInflux(dataInflux)
+		}
 
 		// monitor data for debug
 		fmt.Println("***** dataInflux: start *****")
@@ -151,8 +184,6 @@ func main() {
 		fmt.Println("	data influx install: ", dataInflux.Install)
 		fmt.Println("	data influx battery: ", dataInflux.Battery)
 		fmt.Println("***** dataInflux: end *****")
-
-		writeToInflux(dataInflux)
 		c.JSON(data)
 	})
 

@@ -53,23 +53,38 @@ func checkDeviceData() {
 	fmt.Println("test")
 }
 
-// func readFromPostgres() {
-
-// }
-
-func writeToInflux(dataInflux DataInflux) {
+func writeToInflux(dataInflux *DataInflux) {
 	client := influxdb2.NewClient("http://localhost:8086", "7mCH-C7vjw7ViMTI0hkDIfLm4fse5GA-2kX5BbGP-flkVtc-9sM6QKWQF9l7j7KnAMtSYtTZLlOmyZdOMWBqLQ==")
 	writeAPI := client.WriteAPI("jb", "demo")
 
-	p := influxdb2.NewPointWithMeasurement("JB10").
-		AddTag("unit", "unit of measure").
-		AddField("measurement", 22.2).
-		AddField("air_port", dataInflux.Air_port).
-		AddField("location", dataInflux.Location).
-		AddField("devEUI", dataInflux.DevEUI).
-		AddField("device", dataInflux.Device).
+	p := influxdb2.NewPointWithMeasurement(dataInflux.Measurement).
 		AddField("rssi", dataInflux.Rssi).
+		AddTag("air_port", dataInflux.Air_port).
+		AddTag("devEUI", dataInflux.DevEUI).
+		AddTag("location", dataInflux.Location).
+		AddTag("device", dataInflux.Device).
 		SetTime(dataInflux.Timestamp)
+
+	if dataInflux.Occupancy != nil {
+		p.AddField("occupancy", *dataInflux.Occupancy)
+		fmt.Printf("value occ: %v\n", *dataInflux.Occupancy)
+	}
+
+	if dataInflux.Trigger_count != nil {
+		p.AddField("trigger_count", *dataInflux.Trigger_count)
+		fmt.Printf("value trig: %v\n", *dataInflux.Trigger_count)
+	}
+
+	if dataInflux.Install != nil {
+		p.AddField("install", *dataInflux.Install)
+		fmt.Printf("value install: %v\n", *dataInflux.Install)
+	}
+
+	if dataInflux.Battery != nil {
+		p.AddField("battery", *dataInflux.Battery)
+		fmt.Printf("value batt: %v\n", *dataInflux.Battery)
+	}
+
 	writeAPI.WritePoint(p)
 	writeAPI.Flush()
 }
@@ -90,37 +105,54 @@ func main() {
 			return
 		}
 
-		fmt.Println("==========")
-		fmt.Println("DevEUI: ", data.DevEUI)
-		fmt.Println("==========")
+		fmt.Println(" ")
+		fmt.Println(" ******************* ")
+		fmt.Println("data: ", data)
+		fmt.Println(" ******************* ")
 
-		// ========== data: static ==========
+		// ========== data: common ==========
 		dataInflux := new(DataInflux)
+		fmt.Println("*********************************************************************")
+		fmt.Printf("address dataInflux: %p\n", &dataInflux)
+		fmt.Printf("address dataInflux: %p\n", dataInflux)
+		fmt.Printf("address dataInflux: %v\n", *dataInflux)
+		fmt.Println("*********************************************************************")
+
+		dataInflux.Measurement = "PIR"
 		dataInflux.Timestamp = time.Now()
-		dataInflux.Measurement = "1"
 		dataInflux.Air_port = "pending"
 		dataInflux.Location = "pending"
 		dataInflux.DevEUI = data.DevEUI
 		dataInflux.Device = data.DeviceName
 		dataInflux.Rssi = data.RxInfo[0].Rssi
-		// ========== data: dynamic ==========
-		// ========== data: PIR
+
+		// ========== data: PIR / magnetic
 		dataInflux.Occupancy = data.Object.Occupancy
 		dataInflux.Trigger_count = data.Object.Trigger_count
-		// ========== data: magnetic
+		dataInflux.Install = data.Object.Install
+		dataInflux.Battery = data.Object.Battery
+
+		fmt.Println(dataInflux.Occupancy)
+		fmt.Println(dataInflux.Trigger_count)
+		fmt.Println(dataInflux.Install)
+		fmt.Println(dataInflux.Battery)
 
 		// monitor data for debug
-		fmt.Println(" ===== dataInflux: start =====")
-		fmt.Println("data influx timestamp: ", dataInflux.Timestamp)
-		fmt.Println("data influx measurement: ", dataInflux.Measurement)
-		fmt.Println("data influx airport: (get from postgresql) ", dataInflux.Air_port)
-		fmt.Println("data influx location: (get from postgresql)", dataInflux.Location)
-		fmt.Println("data influx devEUI: ", dataInflux.DevEUI)
-		fmt.Println("data influx device: ", dataInflux.Device)
-		fmt.Println("data influx rssi: ", dataInflux.Rssi)
-		fmt.Println(" ===== dataInflux: end =====")
+		fmt.Println("***** dataInflux: start *****")
+		fmt.Println("  	data influx timestamp: ", dataInflux.Timestamp)
+		fmt.Println("	data influx measurement: ", dataInflux.Measurement)
+		fmt.Println("	data influx airport: (get from postgresql) ", dataInflux.Air_port)
+		fmt.Println("	data influx location: (get from postgresql)", dataInflux.Location)
+		fmt.Println("	data influx devEUI: ", dataInflux.DevEUI)
+		fmt.Println("	data influx device: ", dataInflux.Device)
+		fmt.Println("	data influx rssi: ", dataInflux.Rssi)
+		fmt.Println("	data influx occupancy: ", dataInflux.Occupancy)
+		fmt.Println("	data influx trigger_count: ", dataInflux.Trigger_count)
+		fmt.Println("	data influx install: ", dataInflux.Install)
+		fmt.Println("	data influx battery: ", dataInflux.Battery)
+		fmt.Println("***** dataInflux: end *****")
 
-		if err := writeToInflux(*dataInflux) && err != nil {}
+		writeToInflux(dataInflux)
 		c.JSON(data)
 	})
 

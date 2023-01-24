@@ -1,13 +1,11 @@
 package main
 
 import (
-	"context"
 	"fmt"
 	"time"
 
 	"github.com/gofiber/fiber"
 	influxdb2 "github.com/influxdata/influxdb-client-go/v2"
-	"github.com/jackc/pgx/v4"
 )
 
 type Data struct {
@@ -51,45 +49,6 @@ type DataInflux struct {
 	Battery       *float64  `json:"battery"`
 }
 
-var db *pgx.Conn
-
-func ConnectToDb() {
-	var err error
-	db, err = pgx.Connect(context.Background(), "postgres://jb:12345678@localhost:54320/aot")
-	if err != nil {
-		panic(err)
-	}
-}
-
-func GetDevices() {
-	ConnectToDb()
-	rows, err := db.Query(context.Background(), "SELECT * FROM apis_device	")
-	if err != nil {
-		panic(err)
-		return
-	}
-	defer rows.Close()
-
-	devices := make([]map[string]interface{}, 0)
-	for rows.Next() {
-		var id int
-		var title string
-		var description string
-		var location_id string
-
-		rows.Scan(&id, &title, &description, &location_id)
-		devices = append(devices, map[string]interface{}{
-			"id":          id,
-			"title":       title,
-			"description": description,
-			"location_id": location_id,
-		})
-	}
-
-	fmt.Println(devices)
-	defer db.Close(context.Background())
-}
-
 func writeToInflux(dataInflux *DataInflux) {
 	client := influxdb2.NewClient("http://localhost:8086", "7mCH-C7vjw7ViMTI0hkDIfLm4fse5GA-2kX5BbGP-flkVtc-9sM6QKWQF9l7j7KnAMtSYtTZLlOmyZdOMWBqLQ==")
 	writeAPI := client.WriteAPI("jb", "demo")
@@ -127,8 +86,7 @@ func main() {
 	app := fiber.New()
 
 	app.Get("/", func(c *fiber.Ctx) {
-		GetDevices()
-		c.Send("Hello from API")
+		c.Send("hello world")
 	})
 
 	app.Post("/api/v1/devices/input", func(c *fiber.Ctx) {

@@ -6,6 +6,7 @@ import (
 
 	"github.com/gofiber/fiber"
 	influxdb2 "github.com/influxdata/influxdb-client-go/v2"
+	. "github.com/introbond/env/db_postgres"
 )
 
 type Data struct {
@@ -86,6 +87,7 @@ func main() {
 	app := fiber.New()
 
 	app.Get("/", func(c *fiber.Ctx) {
+		ConnectToPostgres()
 		c.Send("hello world")
 	})
 

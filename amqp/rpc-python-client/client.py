@@ -1,5 +1,6 @@
 import pika
 import uuid
+import time
 
 class RPCClient:
     def __init__(self):
@@ -28,12 +29,18 @@ class RPCClient:
             ),
             body=str(n))
 
+        start_time = time.time()  # record the time before processing
+
         while self.response is None:
             self.connection.process_data_events()
+
+        processing_time = time.time() - start_time  # calculate processing time after response is received
+
+        print(f"Processing time: {processing_time} seconds")  # print processing time
 
         return self.response
 
 rpc_client = RPCClient()
 
-response = rpc_client.call(1)
+response = rpc_client.call(11)
 print("Response:", response.decode())

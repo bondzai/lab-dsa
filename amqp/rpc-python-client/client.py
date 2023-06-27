@@ -1,10 +1,12 @@
+from mockup_tasks import generate_mockup_tasks
+
 import pika
 import uuid
 import time
 
 class RPCClient:
     def __init__(self):
-        self.connection = pika.BlockingConnection(pika.ConnectionParameters('localhost'))
+        self.connection = pika.BlockingConnection(pika.ConnectionParameters('192.168.11.61'))
         self.channel = self.connection.channel()
 
         result = self.channel.queue_declare(queue='', exclusive=True)
@@ -42,5 +44,6 @@ class RPCClient:
 
 rpc_client = RPCClient()
 
-response = rpc_client.call(11)
+tasks = generate_mockup_tasks()
+response = rpc_client.call(tasks)
 print("Response:", response.decode())

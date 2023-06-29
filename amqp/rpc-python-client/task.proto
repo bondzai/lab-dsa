@@ -1,0 +1,44 @@
+syntax = "proto3";
+
+package protobuf;
+
+option go_package = "./";
+
+message TaskInput {
+  string wbs = 1;
+  string parent = 2;
+  repeated string children = 3;
+  string status_date = 4;
+  int32 duration_without_dayoff = 5;
+  int32 duration = 6;
+  double cost = 7;
+  double progress = 8;
+  string baseline_start_date = 9;
+  string baseline_end_date = 10;
+  int32 baseline_duration = 11;
+  double baseline_cost = 12;
+  double BCWP = 13;
+  double BCWS = 14;
+  double SPI = 15;
+  double percent_plan = 16;
+  double percent_actual = 17;
+}
+
+message TaskOutput {
+  string wbs = 1;
+  double cost = 2;
+  double progress = 3;
+  double BCWP = 4;
+  double BCWS = 5;
+  double SPI = 6;
+  double percent_plan = 7;
+  double percent_actual = 8;
+}
+
+message TaskInputArray {
+    repeated TaskInput tasks = 1;
+}
+  
+message TaskOutputArray {
+    repeated TaskOutput tasks = 1;
+}  

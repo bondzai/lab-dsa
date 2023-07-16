@@ -19,9 +19,8 @@ def high_level_scrape(url):
 
         soup = BeautifulSoup(page_source, "html.parser")
 
-        body = soup.find('body')
-        if body:
-            print(body.get_text())
+        find_all = soup.find_all("div",{"class":"MuiContainer-root MuiContainer-maxWidthLg"})
+        print(find_all)
 
     finally:
         driver.quit()

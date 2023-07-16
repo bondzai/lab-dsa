@@ -1,4 +1,6 @@
 import os
+import time
+import random
 from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.common.by import By
@@ -10,32 +12,31 @@ def high_level_scrape(url):
     chrome_options = Options()
     chrome_options.add_argument("--headless")
 
-    # Instantiate the Chrome driver
     driver = webdriver.Chrome(options=chrome_options)
 
     try:
-        # Load the URL in the headless Chrome browser
         driver.get(url)
 
-        # Wait for the headers to be present
-        headers = wait_for_headers(driver)
+        mimic_human_behavior(driver)
+
+        headers = wait_for_element(driver)
         print(headers)
 
     finally:
         driver.quit()
 
-def wait_for_headers(driver):
-    # Define a wait condition for header elements to be present
-    wait = WebDriverWait(driver, 10)
-    wait.until(EC.presence_of_all_elements_located((By.XPATH, "//h1 | //h2 | //h3 | //h4 | //h5 | //h6")))
+def mimic_human_behavior(driver):
+    time.sleep(random.uniform(2, 5))
+    
+def wait_for_element(driver):
+    wait = WebDriverWait(driver, 60)
+    wait.until(EC.visibility_of_element_located((By.CSS_SELECTOR, '#Overview_defiItem__1e5s9 > div:nth-child(2)')))
+    element = driver.find_element(By.CSS_SELECTOR, '#Overview_defiItem__1e5s9 > div:nth-child(2)')
+    data = element.text
 
-    # Find all header elements using XPath
-    headers = driver.find_elements(By.XPATH, "//h1 | //h2 | //h3 | //h4 | //h5 | //h6")
+    return data
 
-    # Extract the text from the headers
-    header_texts = [header.text for header in headers]
 
-    return header_texts
 
 if __name__ == "__main__":
     load_dotenv()

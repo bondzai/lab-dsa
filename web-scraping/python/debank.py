@@ -7,14 +7,8 @@ from selenium.webdriver.support import expected_conditions as EC
 from dotenv import load_dotenv
 
 def high_level_scrape(url):
-    # Configure Chrome options to run headless (without a visible browser window)
     chrome_options = Options()
-    # chrome_options.add_argument("--headless")
-    chrome_options.add_argument("--disable-gpu")
-    chrome_options.add_argument("--disable-dev-shm-usage")
-    chrome_options.add_argument("--disable-setuid-sandbox")
-    chrome_options.add_argument("--no-sandbox")
-    chrome_options.add_argument("--disable-dev-shm-usage")
+    chrome_options.add_argument("--headless")
 
     # Instantiate the Chrome driver
     driver = webdriver.Chrome(options=chrome_options)
@@ -23,15 +17,25 @@ def high_level_scrape(url):
         # Load the URL in the headless Chrome browser
         driver.get(url)
 
-        # Wait for the specific element to load
-        WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.CSS_SELECTOR, '#Overview_defiItem__1e5s9 > div:nth-child(2)')))
-
-        # Get the element's data
-        element = driver.find_element(By.CSS_SELECTOR, '#Overview_defiItem__1e5s9 > div:nth-child(2)')
-        print(element.text)  # print the content of the element
+        # Wait for the headers to be present
+        headers = wait_for_headers(driver)
+        print(headers)
 
     finally:
         driver.quit()
+
+def wait_for_headers(driver):
+    # Define a wait condition for header elements to be present
+    wait = WebDriverWait(driver, 10)
+    wait.until(EC.presence_of_all_elements_located((By.XPATH, "//h1 | //h2 | //h3 | //h4 | //h5 | //h6")))
+
+    # Find all header elements using XPath
+    headers = driver.find_elements(By.XPATH, "//h1 | //h2 | //h3 | //h4 | //h5 | //h6")
+
+    # Extract the text from the headers
+    header_texts = [header.text for header in headers]
+
+    return header_texts
 
 if __name__ == "__main__":
     load_dotenv()

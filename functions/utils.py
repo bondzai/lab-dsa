@@ -1,6 +1,6 @@
 from datetime import datetime
 
-class Utiles:
+class Utils:
         
     def get_formatted_datetime(self):
             current_datetime = datetime.now()

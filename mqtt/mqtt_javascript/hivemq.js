@@ -1,32 +1,28 @@
-var mqtt = require('mqtt')
+require('dotenv').config();
+const mqtt = require('mqtt');
 
-var options = {
-    host: '8408b31bb1574812a7dbc8cffb2dd85a.s2.eu.hivemq.cloud',
-    port: 8883,
-    protocol: 'mqtts',
-    username: 'jamesbond',
-    password: 'password1234'
-}
+const options = {
+    host: process.env.MQTT_HOST,
+    port: parseInt(process.env.MQTT_PORT),
+    protocol: process.env.MQTT_PROTOCOL,
+    username: process.env.MQTT_USERNAME,
+    password: process.env.MQTT_PASSWORD
+};
 
-// initialize the MQTT client
-var client = mqtt.connect(options);
+const client = mqtt.connect(options);
 
-// setup the callbacks
-client.on('connect', function () {
+client.on('connect', () => {
     console.log('Connected');
 });
 
-client.on('error', function (error) {
-    console.log(error);
+client.on('error', (error) => {
+    console.error(error);
 });
 
-client.on('message', function (topic, message) {
-    // called each time a message is received
+client.on('message', (topic, message) => {
     console.log('Received message:', topic, message.toString());
 });
 
-// subscribe to topic 'my/test/topic'
 client.subscribe('my/test/topic');
 
-// publish message 'Hello' to topic 'my/test/topic'
-client.publish('my/test/topic', 'Hello');
+client.publish('my/test/topic', 'Hello from JS client');

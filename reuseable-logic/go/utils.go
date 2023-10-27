@@ -55,3 +55,9 @@ func PerformanceMonitor(f func() interface{}) func() interface{} {
 		return result
 	}
 }
+
+// Helper function to compare floating point numbers
+func AlmostEqual(a, b float64) bool {
+	epsilon := 0.00000001
+	return math.Abs(a-b) <= epsilon
+}

@@ -56,6 +56,14 @@ func PerformanceMonitor(f func() interface{}) func() interface{} {
 	}
 }
 
+func TrackPerformance(taskName string) func() {
+	timeStart := time.Now()
+	return func() {
+		timeEnd := time.Now()
+		log.Printf("%s took %v to run.\n", taskName, timeEnd.Sub(timeStart))
+	}
+}
+
 // Helper function to compare floating point numbers
 func AlmostEqual(a, b float64) bool {
 	epsilon := 0.00000001

@@ -1,6 +1,7 @@
 package main
 
 import (
+	"math"
 	"sort"
 	"strconv"
 )
@@ -47,7 +48,7 @@ func findItemsWithCount(counts map[int]int, targetCount int) []int {
 	return items
 }
 
-func reverse(input string) (result string) {
+func reverseString(input string) (result string) {
 	for _, v := range input {
 		result = string(v) + result
 	}
@@ -56,6 +57,22 @@ func reverse(input string) (result string) {
 
 func isPalindrome(input int) bool {
 	real := strconv.Itoa(input)
-	mirror := reverse(real)
+	mirror := reverseString(real)
 	return real == mirror
+}
+
+func reverseInt(x int) int {
+	reversed := 0
+	for x != 0 {
+		pop := x % 10
+		x /= 10
+		if reversed > math.MaxInt32/10 || (reversed == math.MaxInt32/10 && pop > 7) {
+			return 0 // Return 0 if reversing x causes overflow
+		}
+		if reversed < math.MinInt32/10 || (reversed == math.MinInt32/10 && pop < -8) {
+			return 0 // Return 0 if reversing x causes underflow
+		}
+		reversed = reversed*10 + pop
+	}
+	return reversed
 }

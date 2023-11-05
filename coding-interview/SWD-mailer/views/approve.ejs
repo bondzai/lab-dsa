@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title> Approve work sheet </title>
+</head>
+<body>
+    <h1> Check the details and continue to approve. </h1>
+      <form method="POST" action="/approve" enctype="application/x-www-form-urlencoded">
+        <div class="container">
+          <label for="id">USER ID: </label>
+          <input type="text" id="id" name="id" value="<%= loggedinID%>" readonly><br><br>
+          <label for="name">USER NAME: </label>
+          <input type="text" id="name" name="name" value="<%= loggedinName%>"readonly><br><br>
+          <label for="approve_status">APPROVE STATUS: </label>
+          <input type="text" id="approve_status" name="approve_status" value="<%= loggedinApproveStatus%>" readonly><br><br>
+          <button type="submit">APPROVE</button>
+        </div>
+      </form>
+</body>
+</html>

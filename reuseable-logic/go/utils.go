@@ -1,9 +1,8 @@
 package utils
 
 import (
-	"encoding/json"
-	"fmt"
 	"log"
+	"math"
 	"os"
 	"time"
 
@@ -31,28 +30,6 @@ func GetEnv(key, fallback string) string {
 func FailOnError(err error, msg string) {
 	if err != nil {
 		log.Panicf("%s: %s", msg, err)
-	}
-}
-
-func PrintStruct(data interface{}) {
-	jsonBytes, err := json.MarshalIndent(data, "", "\t")
-	if err != nil {
-		log.Printf("Error while marshaling data to JSON: %v", err)
-	} else {
-		fmt.Println(string(jsonBytes))
-	}
-}
-
-func PerformanceMonitor(f func() interface{}) func() interface{} {
-	return func() interface{} {
-		startTime := time.Now()
-		result := f()
-		endTime := time.Now()
-
-		elapsedTime := endTime.Sub(startTime)
-		fmt.Printf("Function took %s to execute.\n", elapsedTime)
-
-		return result
 	}
 }
 

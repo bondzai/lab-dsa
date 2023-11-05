@@ -2,6 +2,7 @@ package main
 
 import (
 	"reflect"
+	"strconv"
 	"testing"
 )
 
@@ -164,4 +165,29 @@ func compareSlices(a, b []int) bool {
 		}
 	}
 	return true
+}
+
+func TestIsPalindrome(t *testing.T) {
+	testCases := []struct {
+		input    int
+		expected bool
+	}{
+		{121, true},     // Palindrome
+		{12321, true},   // Palindrome
+		{1234321, true}, // Palindrome
+		{123, false},    // Not a palindrome
+		{12345, false},  // Not a palindrome
+	}
+
+	for _, tc := range testCases {
+		t.Run(
+			strconv.Itoa(tc.input), // Use the input as the subtest name
+			func(t *testing.T) {
+				result := isPalindrome(tc.input)
+				if result != tc.expected {
+					t.Errorf("Expected isPalindrome(%d) to be %v, but got %v", tc.input, tc.expected, result)
+				}
+			},
+		)
+	}
 }

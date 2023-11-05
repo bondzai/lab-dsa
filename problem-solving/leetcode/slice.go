@@ -2,6 +2,7 @@ package main
 
 import (
 	"sort"
+	"strconv"
 )
 
 func findDuplicates(input []int) []int {
@@ -44,4 +45,17 @@ func findItemsWithCount(counts map[int]int, targetCount int) []int {
 	sort.Ints(items)
 
 	return items
+}
+
+func reverse(input string) (result string) {
+	for _, v := range input {
+		result = string(v) + result
+	}
+	return result
+}
+
+func isPalindrome(input int) bool {
+	real := strconv.Itoa(input)
+	mirror := reverse(real)
+	return real == mirror
 }

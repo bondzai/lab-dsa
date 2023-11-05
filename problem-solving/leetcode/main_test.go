@@ -214,3 +214,36 @@ func TestReverseInt(t *testing.T) {
 		})
 	}
 }
+
+func TestAddTwoNumbers(t *testing.T) {
+	// Test case 1
+	l1 := &ListNode{Val: 2, Next: &ListNode{Val: 4, Next: &ListNode{Val: 3}}}
+	l2 := &ListNode{Val: 5, Next: &ListNode{Val: 6, Next: &ListNode{Val: 4}}}
+	expectedResult := &ListNode{Val: 7, Next: &ListNode{Val: 0, Next: &ListNode{Val: 8}}}
+	result := addTwoNumbers(l1, l2)
+	if !isSameList(result, expectedResult) {
+		t.Errorf("Test case 1 failed. Expected: %v, Got: %v", expectedResult, result)
+	}
+
+	// Test case 2
+	l1 = &ListNode{Val: 0}
+	l2 = &ListNode{Val: 0}
+	expectedResult = &ListNode{Val: 0}
+	result = addTwoNumbers(l1, l2)
+	if !isSameList(result, expectedResult) {
+		t.Errorf("Test case 2 failed. Expected: %v, Got: %v", expectedResult, result)
+	}
+}
+
+func isSameList(l1 *ListNode, l2 *ListNode) bool {
+	for l1 != nil && l2 != nil {
+		if l1.Val != l2.Val {
+			return false
+		}
+		l1 = l1.Next
+		l2 = l2.Next
+	}
+
+	// If one of the lists is not nil, they are not the same.
+	return l1 == nil && l2 == nil
+}

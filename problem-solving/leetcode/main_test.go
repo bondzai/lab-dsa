@@ -191,3 +191,26 @@ func TestIsPalindrome(t *testing.T) {
 		)
 	}
 }
+
+func TestReverseInt(t *testing.T) {
+	testCases := []struct {
+		input    int
+		expected int
+	}{
+		{123, 321},
+		{-123, -321},
+		{120, 21},
+		{0, 0},
+		{1534236469, 0},  // Overflow case
+		{-2147483648, 0}, // Underflow case
+	}
+
+	for _, tc := range testCases {
+		t.Run("", func(t *testing.T) {
+			result := reverseInt(tc.input)
+			if result != tc.expected {
+				t.Errorf("reverseInt(%d) = %d; want %d", tc.input, result, tc.expected)
+			}
+		})
+	}
+}
